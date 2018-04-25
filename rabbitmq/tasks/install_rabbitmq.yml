@@ -1,0 +1,35 @@
+---
+# Task file for rabbitmq installation
+
+- name: Download erlang repo package
+  get_url:
+    url: "{{ erlang_repo_url }}"
+    dest: "/tmp/{{ erlang_repo_name }}"
+
+- name: Install erlang repo
+  apt:
+    deb: "/tmp/{{ erlang_repo_name }}"
+
+- name: Install erlang package
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - socat
+    - erlang-base
+    - erlang-nox
+
+- name: Download rabbitmq repo script
+  get_url:
+    url: "{{ rabbitmq_repo_script }}"
+    dest: /tmp/
+    mode: 0755
+
+- name: Execute script to install rabbitmq repo
+  shell: /tmp/script.deb.sh
+
+- name: Install rabbitmq package
+  apt:
+    name: "{{ rabbitmq_package }}"
+    update_cache: yes

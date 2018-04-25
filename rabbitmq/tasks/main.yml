@@ -1,0 +1,11 @@
+---
+# tasks file for rabbitmq
+- import_tasks: install_rabbitmq.yml
+  tags:
+    - install_rabbitmq
+    - install_and_configure_rabbitmq
+
+- import_tasks: configure_rabbitmq.yml
+  tags:
+    - configure_rabbitmq
+    - install_and_configure_rabbitmq

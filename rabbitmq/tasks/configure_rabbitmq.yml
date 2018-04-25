@@ -1,0 +1,44 @@
+---
+# Task file for rabbitmq configuration
+
+- name: Enable rabbitmq management
+  command: rabbitmq-plugins enable rabbitmq_management
+
+- name: Enable shovel
+  command: rabbitmq-plugins enable rabbitmq_shovel
+
+- name: Enable shovel management
+  command: rabbitmq-plugins enable rabbitmq_shovel_management
+
+- name: Create new user radmin
+  command: rabbitmqctl add_user radmin radmin
+
+- name: Add user to administrator group
+  command: rabbitmqctl set_user_tags radmin administrator
+
+- name: Give permissions to user radmin
+  command: rabbitmqctl set_permissions -p / radmin ".*" ".*" ".*"
+
+- name: Download rabbitmqadmin binary
+  get_url:
+    url: http://127.0.0.1:15672/cli/rabbitmqadmin
+    dest: /usr/sbin/
+    mode: 0755
+
+- name: Create queue myQueue
+  command: rabbitmqadmin declare queue name="myQueue" durable=true auto_delete=false
+
+- name: Create queue myQueue2
+  command: rabbitmqadmin declare queue name="myQueue2" durable=true auto_delete=false
+
+- name: Bind exchange to queue 
+  command: rabbitmqadmin declare binding source="amq.direct" destination_type="queue" destination="myQueue" routing_key="myMessage"
+
+- name: Bind exchange to myQueue2
+  command: rabbitmqadmin declare binding source="amq.fanout" destination_type="queue" destination="myQueue2" routing_key="myMessage"
+
+- name: send message
+  command: rabbitmqadmin publish exchange=amq.direct routing_key=myMessage payload="hello, world"
+
+- name: send message
+  command: rabbitmqadmin publish exchange=amq.fanout routing_key=myMessage payload="hello, world" 
